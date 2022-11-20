@@ -73,11 +73,11 @@ class _CalculatorState extends State<Calculator> {
                   return DropdownMenuItem<String>(
                       value: val,
                       child: Center(
-                        child:Text(val,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ))));
+                          child: Text(val,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ))));
                 }).toList(),
               ),
             ),
@@ -128,9 +128,9 @@ class _CalculatorState extends State<Calculator> {
                       input2 = number2Controller.text;
                       number1 = double.parse(input1);
                       number2 = double.parse(input2);
-                      answerController.text =
-                          doOperation(number1, number2, selectedOperator)
-                              .toString();
+                      answerController.text = doOperation(
+                              number1, number2, selectedOperator, context)
+                          .toString();
                     });
                   }
                 },
@@ -142,7 +142,8 @@ class _CalculatorState extends State<Calculator> {
   }
 }
 
-double? doOperation(double num1, double num2, String? operator) {
+double? doOperation(
+    double num1, double num2, String? operator, BuildContext context) {
   double answer = 0;
   switch (operator) {
     case '+':
@@ -155,7 +156,13 @@ double? doOperation(double num1, double num2, String? operator) {
       answer = num1 * num2;
       break;
     case '/':
-      answer = num1 / num2;
+      {
+        if (num2 == 0) {
+          displayDivideByZeroError(context);
+        } else {
+          answer = num1 / num2;
+        }
+      }
       break;
     default:
       return null;
@@ -208,6 +215,36 @@ Future<void> displayNullOperator(BuildContext context) async {
             ),
           ),
           content: const Text("Please select an operator.",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              )),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("OK"),
+            )
+          ],
+        );
+      }));
+}
+
+Future<void> displayDivideByZeroError(BuildContext context) async {
+  return showDialog(
+      context: context,
+      builder: ((context) {
+        return AlertDialog(
+          title: const Text(
+            "Error",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+              color: Colors.red,
+            ),
+          ),
+          content: const Text("You can't divide by zero.",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
